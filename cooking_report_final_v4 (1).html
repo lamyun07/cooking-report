@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>요리수업 보고서</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-family: 'Jua', sans-serif;
+            text-align: center;
+            font-size: 36px;
+            color: #ff6b81;
+            margin-bottom: 30px;
+        }
+        .header-info {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .header-info input {
+            padding: 8px 12px;
+            font-size: 16px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-family: 'Noto Sans KR', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .header-info input:focus {
+            border-color: #ff6b81;
+        }
+
+        /* 구역 디자인 */
+        .section {
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        /* 클릭 시 활성화 테두리 (붙여넣기 타겟) */
+        .section.active-section {
+            border-color: #ff6b81;
+            box-shadow: 0 0 10px rgba(255, 107, 129, 0.3);
+        }
+
+        .sec-menu { background-color: #ffe4e1; } /* 분홍 */
+        .sec-tools { background-color: #fffacd; } /* 노랑 */
+        .sec-ingredients { background-color: #e0ffff; } /* 민트 */
+        .sec-steps { background-color: #f0f8ff; } /* 하늘 */
+        .sec-cautions { background-color: #e6e6fa; } /* 보라 */
+        .sec-review { background-color: #ffebcd; } /* 살구 */
+
+        .sec-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .sec-title {
+            font-family: 'Jua', sans-serif;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .controls {
+            display: flex;
+            gap: 8px;
+        }
+        button {
+            font-family: 'Jua', sans-serif;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: transform 0.1s;
+        }
+        button:active { transform: scale(0.95); }
+        .btn-photo { background-color: #4CAF50; color: white; }
+        .btn-text { background-color: #2196F3; color: white; }
+        .btn-clear { background-color: #ff4757; color: white; }
+
+        /* 입력 폼 (한 줄) */
+        .single-line-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: 'Noto Sans KR', sans-serif;
+            background: rgba(255,255,255,0.7);
+            outline: none;
+        }
+        .single-line-input:focus { border-style: solid; border-color: #ff6b81; background: white; }
+
+        /* 입력 폼 (여러 줄 - 자동 확장 및 잘림 방지 핵심 기술) */
+        .multi-line-input {
+            width: 100%;
+            min-height: 100px;
+            box-sizing: border-box;
+            padding: 15px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.7);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;     /* 줄바꿈 유지 */
+            word-break: break-all;     /* 긴 단어 줄바꿈 */
+            outline: none;
+            margin-bottom: 10px;
+        }
+        .multi-line-input:focus {
+            border-style: solid;
+            border-color: #ff6b81;
+            background: white;
+        }
+        /* placeholder 역할 */
+        .multi-line-input:empty:before {
+            content: attr(data-placeholder);
+            color: #999;
+            pointer-events: none;
+        }
+
+        /* 사진 & 글자 카드 */
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            width: 160px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .card img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .card input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px dashed #ccc;
+            padding: 6px;
+            border-radius: 6px;
+            text-align: center;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            outline: none;
+        }
+        .card input:focus { border-style: solid; border-color: #ff6b81; }
+        .text-only-card {
+            width: auto;
+            min-width: 160px;
+            max-width: 300px;
+            flex: 1;
+        }
+        .text-only-card input {
+            height: 40px;
+            font-size: 16px;
+        }
+
+        .btn-remove-card {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            text-align: center;
+            line-height: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .print-btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .print-btn {
+            background-color: #ffa502;
+            color: white;
+            font-size: 22px;
+            padding: 12px 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* 인쇄 (PDF 저장) 전용 스타일 */
+        @media print {
+            body { background-color: white; padding: 0; margin: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; width: 100%; }
+            button, .btn-remove-card, .controls, .print-btn-container { display: none !important; }
+
+            .section {
+                border: none !important;
+                box-shadow: none !important;
+                margin-bottom: 15px;
+                padding: 10px 0;
+            }
+
+            /* 카드 페이지 넘어갈 때 반으로 잘리지 않게 방지 */
+            .card {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                border: 1px solid #eee;
+                box-shadow: none;
+            }
+
+            /* 입력칸 인쇄 시 테두리 제거 */
+            .single-line-input, .multi-line-input {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 5px !important;
+            }
+            .multi-line-input:empty:before { content: ""; } /* 빈칸 플레이스홀더 인쇄 안 함 */
+            .card input { border: none !important; background: transparent !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📝 즐거운 요리수업 보고서</h1>
+
+    <div class="header-info">
+        <input type="date" id="today-date">
+        <input type="text" placeholder="학번" style="width: 80px;">
+        <input type="text" placeholder="이름" style="width: 100px;">
+    </div>
+
+    <!-- 메뉴 -->
+    <div class="section sec-menu" id="sec-menu">
+        <div class="sec-header">
+            <div class="sec-title">👨‍🍳 메뉴</div>
+            <div class="controls">
+                <button class="btn-clear" onclick="clearSection('sec-menu')">삭제</button>
+            </div>
+        </div>
+        <input type="text" class="single-line-input" placeholder="오늘의 요리 이름은 무엇인가요?">
+    </div>
+
+    <!-- 도구 -->
+    <div class="section sec-tools" id="sec-tools">
+        <div class="sec-header">
+            <div class="sec-title">🍳 도구</div>
+            <div class="controls">
+                <button class="btn-text" onclick="addTextCard('sec-tools')">✏️ 글자 추가</button>
+                <button class="btn-photo" onclick="triggerPhotoUpload('sec-tools')">📷 사진 추가</button>
+                <button class="btn-clear" onclick="clearSection('sec-tools')">삭제</button>
+            </div>
+        </div>
+        <div class="cards-container"></div>
+    </div>
+
+    <!-- 재료 -->
+    <div class="section sec-ingredients" id="sec-ingredients">
+        <div class="sec-header">
+            <div class="sec-title">🌿 재료</div>
+            <div class="controls">
+                <button class="btn-text" onclick="addTextCard('sec-ingredients')">✏️ 글자 추가</button>
+                <button class="btn-photo" onclick="triggerPhotoUpload('sec-ingredients')">📷 사진 추가</button>
+                <button class="btn-clear" onclick="clearSection('sec-ingredients')">삭제</button>
+            </div>
+        </div>
+        <div class="cards-container"></div>
+    </div>
+
+    <!-- 조리 순서 -->
+    <div class="section sec-steps" id="sec-steps">
+        <div class="sec-header">
+            <div class="sec-title">⏳ 조리 순서</div>
+            <div class="controls">
+                <button class="btn-photo" onclick="triggerPhotoUpload('sec-steps')">📷 사진 추가</button>
+                <button class="btn-clear" onclick="clearSection('sec-steps')">삭제</button>
+            </div>
+        </div>
+        <!-- 수정됨: textarea 대신 contenteditable div를 사용하여 절대 잘리지 않음 -->
+        <div class="multi-line-input" contenteditable="true" data-placeholder="조리 순서를 자세히 적어보세요. 길게 적어도 자동으로 늘어납니다!"></div>
+        <div class="cards-container"></div>
+    </div>
+
+    <!-- 주의 사항 -->
+    <div class="section sec-cautions" id="sec-cautions">
+        <div class="sec-header">
+            <div class="sec-title">💡 주의 사항</div>
+            <div class="controls">
+                <button class="btn-text" onclick="addTextCard('sec-cautions')">✏️ 글자 추가</button>
+                <button class="btn-photo" onclick="triggerPhotoUpload('sec-cautions')">📷 사진 추가</button>
+                <button class="btn-clear" onclick="clearSection('sec-cautions')">삭제</button>
+            </div>
+        </div>
+        <div class="multi-line-input" contenteditable="true" data-placeholder="불이나 칼을 사용할 때 주의할 점 등을 적어주세요."></div>
+        <div class="cards-container"></div>
+    </div>
+
+    <!-- 오늘의 소감 -->
+    <div class="section sec-review" id="sec-review">
+        <div class="sec-header">
+            <div class="sec-title">💖 오늘의 소감</div>
+            <div class="controls">
+                <button class="btn-photo" onclick="triggerPhotoUpload('sec-review')">📷 사진 추가</button>
+                <button class="btn-clear" onclick="clearSection('sec-review')">삭제</button>
+            </div>
+        </div>
+        <!-- 수정됨: 소감 역시 잘리지 않게 자동 확장 -->
+        <div class="multi-line-input" contenteditable="true" data-placeholder="오늘 요리수업에서 느낀 점, 맛, 재밌었던 점을 자유롭게 적어주세요."></div>
+        <div class="cards-container"></div>
+    </div>
+
+    <div class="print-btn-container">
+        <button class="print-btn" onclick="window.print()">📄 PDF로 저장 (인쇄)</button>
+    </div>
+</div>
+
+<script>
+    // 1. 날짜 자동 입력
+    document.getElementById('today-date').value = new Date().toISOString().substring(0, 10);
+
+    // 2. 활성화된 구역(섹션) 추적 로직 - 복사 붙여넣기를 위해 필요
+    let activeSectionId = null;
+    document.querySelectorAll('.section').forEach(sec => {
+        sec.addEventListener('click', (e) => {
+            // 버튼이나 삭제 마크 누를 때는 테두리 활성화만 방지
+            if (e.target.tagName === 'BUTTON' || e.target.classList.contains('btn-remove-card')) return;
+
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
+            sec.classList.add('active-section');
+            activeSectionId = sec.id;
+        });
+    });
+
+    // 3. 사진 복사 붙여넣기 완벽 수정 (에러 및 텍스트 꼬임 방지)
+    document.addEventListener('paste', (e) => {
+        let hasImage = false;
+        let imageFile = null;
+
+        // 클립보드에 이미지 파일이 있는지 확인
+        if (e.clipboardData && e.clipboardData.items) {
+            for (let i = 0; i < e.clipboardData.items.length; i++) {
+                if (e.clipboardData.items[i].type.indexOf('image/') !== -1) {
+                    hasImage = true;
+                    imageFile = e.clipboardData.items[i].getAsFile();
+                    break;
+                }
+            }
+        }
+
+        if (hasImage) {
+            // 이미지인 경우: 텍스트 입력창 안에 이미지가 텍스트처럼 들어가는 것을 막음
+            e.preventDefault(); 
+
+            // 붙여넣을 타겟 구역 찾기 (현재 활성화된 구역)
+            let targetSectionId = activeSectionId;
+
+            // 만약 유저가 테두리 클릭 없이 텍스트 치다가 바로 붙여넣었다면, 현재 타이핑 중인 구역으로 설정
+            if (document.activeElement) {
+                const closest = document.activeElement.closest('.section');
+                if (closest) targetSectionId = closest.id;
+            }
+
+            if (!targetSectionId) {
+                alert('📌 이미지를 추가할 구역(예: 도구, 재료 배경)을 먼저 클릭해서 핑크색 테두리가 나오게 한 뒤 붙여넣기(Ctrl+V) 해주세요!');
+                return;
+            }
+
+            // 이미지 읽어서 카드 추가
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                addPhotoCard(targetSectionId, event.target.result);
+            };
+            reader.readAsDataURL(imageFile);
+
+        } else {
+            // 텍스트 붙여넣기인 경우
+            const activeEl = document.activeElement;
+            // 텍스트 박스(contenteditable)에 서식(표, 글꼴 등) 딸려오지 않고 '순수 텍스트'만 예쁘게 붙여넣기
+            if (activeEl && activeEl.getAttribute('contenteditable') === 'true') {
+                e.preventDefault();
+                let text = (e.originalEvent || e).clipboardData.getData('text/plain');
+                document.execCommand('insertText', false, text);
+            }
+        }
+    });
+
+    // 4. 기능 함수들
+    function triggerPhotoUpload(sectionId) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.multiple = true;
+        input.onchange = (e) => {
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    addPhotoCard(sectionId, ev.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+        input.click();
+    }
+
+    function addPhotoCard(sectionId, imgSrc) {
+        const container = document.querySelector(`#${sectionId} .cards-container`);
+        if (!container) return;
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <div class="btn-remove-card" onclick="this.parentElement.remove()">×</div>
+            <img src="${imgSrc}" alt="사진">
+            <input type="text" placeholder="이름 입력">
+        `;
+        container.appendChild(card);
+    }
+
+    function addTextCard(sectionId) {
+        const container = document.querySelector(`#${sectionId} .cards-container`);
+        if (!container) return;
+        const card = document.createElement('div');
+        card.className = 'card text-only-card';
+        card.innerHTML = `
+            <div class="btn-remove-card" onclick="this.parentElement.remove()">×</div>
+            <input type="text" placeholder="내용 입력">
+        `;
+        container.appendChild(card);
+    }
+
+    function clearSection(sectionId) {
+        if(confirm('이 구역의 내용을 모두 지우시겠습니까?')) {
+            const container = document.querySelector(`#${sectionId} .cards-container`);
+            if (container) container.innerHTML = '';
+
+            const singleInput = document.querySelector(`#${sectionId} .single-line-input`);
+            if (singleInput) singleInput.value = '';
+
+            const multiInput = document.querySelector(`#${sectionId} .multi-line-input`);
+            if (multiInput) multiInput.innerHTML = '';
+        }
+    }
+</script>
+
+</body>
+</html>
